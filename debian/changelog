@@ -1,3 +1,14 @@
+kubeos-pause-image (3.10.2-2) trixie; urgency=medium
+
+  * Debian revision numbering: 3.10.2-1kubeos1 -> 3.10.2-2. The revision is a plain Debian one now
+    instead of the 1kubeosN prefix the first uploads used; the upstream version is
+    unchanged. The KubeOS distribution version lives in kubeos-base, which is 0.2.0.
+  * Note the revision: 3.10.2-1 would sort BELOW 3.10.2-1kubeos1 (a revision that is a
+    prefix of another sorts first), so the plain revision here is -2 - -1 would never
+    install as an upgrade on a node that already has the old one.
+
+ -- KubeOS <mail@kubeos.in>  Fri, 20 Nov 2026 01:00:00 +0530
+
 kubeos-pause-image (3.10.2-1kubeos1) trixie; urgency=medium
 
   * Initial packaging. registry.k8s.io/pause:3.10.2, the tag kubeadm 1.37 expects,
