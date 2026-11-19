@@ -1,0 +1,43 @@
+#!/bin/sh
+# KubeOS pause image, postinst: put the sandbox image into containerd's k8s.io namespace.
+#
+# WHY    The kubelet asks containerd for exactly the pause tag kubeadm expects and, on a node
+#        without a registry, a missing image means no Pod can start. The ISO build imports this
+#        archive inside the chroot (hook 9030); this handles the other case - the package being
+#        upgraded on a running node, where containerd is up and the new tag must be imported
+#        before the next kubelet restart.
+# SAFE   Warn-only and idempotent: importing an image that already exists is a no-op, and a
+#        node without a running containerd is left exactly as it was. A missing sandbox image
+#        is a kubelet problem, never a reason to fail an upgrade.
+set -e
+
+DIR=/usr/share/kubeos/pause
+SOCK=/run/containerd/containerd.sock
+warn() { printf 'kubeos-pause-image: WARNING: %s\n' "$*" >&2; }
+
+case "${1:-}" in
+    configure) : ;;
+    *) exit 0 ;;
+esac
+
+[ -f "$DIR/pause.tar" ] || { warn "$DIR/pause.tar is missing"; exit 0; }
+
+if [ ! -S "$SOCK" ]; then
+    warn "containerd is not running; $DIR/pause.tar will be imported by the next build or boot"
+    exit 0
+fi
+if ! command -v ctr >/dev/null 2>&1; then
+    warn "ctr is not installed; cannot import $DIR/pause.tar"
+    exit 0
+fi
+
+IMAGE=$(cat "$DIR/IMAGE" 2>/dev/null || echo "")
+ctr -n k8s.io images import "$DIR/pause.tar" >/dev/null 2>&1 \
+    || { warn "ctr images import failed"; exit 0; }
+
+if [ -n "$IMAGE" ] && ! ctr -n k8s.io images ls -q | grep -qx "$IMAGE"; then
+    warn "$IMAGE is not in the containerd store after the import"
+else
+    printf 'kubeos-pause-image: imported %s\n' "${IMAGE:-the sandbox image}"
+fi
+exit 0

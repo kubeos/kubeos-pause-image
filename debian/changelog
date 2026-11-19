@@ -1,0 +1,7 @@
+kubeos-pause-image (3.10.2-1kubeos1) trixie; urgency=medium
+
+  * Initial packaging. registry.k8s.io/pause:3.10.2, the tag kubeadm 1.37 expects,
+    exported as an OCI archive (321 KB, sha256 in SHA256). Replaces the network pull
+    that build hook 9030 used to do.
+
+ -- KubeOS <mail@kubeos.in>  Thu, 19 Nov 2026 09:45:00 +0530

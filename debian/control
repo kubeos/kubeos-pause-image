@@ -1,0 +1,20 @@
+Source: kubeos-pause-image
+Section: admin
+Priority: optional
+Maintainer: KubeOS <mail@kubeos.in>
+Build-Depends: debhelper-compat (= 13)
+Standards-Version: 4.7.0
+Rules-Requires-Root: no
+Homepage: https://kubeos.in/
+
+Package: kubeos-pause-image
+Architecture: all
+Depends: ${misc:Depends}, containerd.io
+Description: the pod sandbox (pause) image, shipped offline
+ Every container KubeOS runs - including yours - starts inside the pause image, and
+ a node has no registry after installation. This package carries that image as an OCI
+ archive so the kubelet never has to pull it, and so the tag can move with kubeadm
+ through apt instead of through a new ISO.
+ .
+ The archive is imported into containerd's k8s.io namespace by the build hook (offline
+ builds) or by this package's postinst when containerd is already running.

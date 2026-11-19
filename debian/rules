@@ -1,0 +1,8 @@
+#!/usr/bin/make -f
+%:
+	dh $@
+
+# Nothing under /etc, so no conffiles: this package is one data file plus a postinst.
+override_dh_installdeb:
+	dh_installdeb
+	: > debian/kubeos-pause-image/DEBIAN/conffiles
