@@ -11,6 +11,11 @@
 #        is a kubelet problem, never a reason to fail an upgrade.
 set -e
 
+# debhelper inserts its generated snippets here (systemd enable/reload, dpkg-maint-script
+# helpers). It must sit before this script's own exits, otherwise they never run - that is
+# exactly how every KubeOS package ended up with units debhelper never enabled.
+#DEBHELPER#
+
 DIR=/usr/share/kubeos/pause
 SOCK=/run/containerd/containerd.sock
 warn() { printf 'kubeos-pause-image: WARNING: %s\n' "$*" >&2; }
